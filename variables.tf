@@ -155,6 +155,10 @@ variable "network_pod_ipv4_cidr" {
   type        = string
   default     = null # 10.0.128.0/17 when network_ipv4_cidr is 10.0.0.0/16
   description = "Defines the Pod IPv4 CIDR block allocated for use by pods within the cluster. This CIDR block is essential for internal pod communications. If a specific subnet is not provided, a default is dynamically calculated from the network_ipv4_cidr."
+  validation {
+    condition     = var.network_service_ipv4_cidr == null || tonumber(split("/", var.network_service_ipv4_cidr)[1]) >= 12
+    error_message = "network_service_ipv4_cidr must have a prefix length >= /12. Kubernetes 1.33+ requires --service-cluster-ip-range mask >= /12 for IPv4."
+  }
 }
 
 variable "network_native_routing_ipv4_cidr" {
